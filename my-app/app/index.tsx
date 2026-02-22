@@ -151,6 +151,7 @@ export default function App() {
     requestCameraPermission();
   }
 
+  // The UI stuff
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing='back' />
@@ -172,38 +173,17 @@ export default function App() {
         >
           <Text style={styles.text}>{isSearching ? 'Searching...' : 'Find Nearby'}</Text>
         </TouchableOpacity>
-
-        {menuOpen && (
-          <View style={styles.dropdown}>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() => {
-                setMenuOpen(false);
-                router.push('/faq');
-              }}
-            >
-              <Text style={styles.dropdownText}>FAQ</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() => {
-                setMenuOpen(false);
-                router.push('/settings');
-              }}
-            >
-              <Text style={styles.dropdownText}>Settings</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
-    </Pressable>
+    </View>
   );
 }
 
+
+// The style stuff
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
   camera: {
     flex: 1,
@@ -245,11 +225,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 120,
-    alignSelf: 'center',
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
+    bottom: 64,
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    width: '100%',
+    paddingHorizontal: 64,
   },
   button: {
     flex: 1,
@@ -261,23 +241,10 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: '#888888',
   },
-  hamburgerText: {
-    color: 'white',
-    fontSize: 22,
+  text: {
+    fontSize: 24,
     fontWeight: 'bold',
-  },
-  dropdown: {
-    marginTop: 8,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  dropdownText: {
     color: 'white',
-    fontSize: 16,
   },
 });
+
