@@ -21,7 +21,12 @@ import { SEARCH_RADIUS } from '../constants/config';
     };
   }
 
-  // Our existing fetchWikiPlaces function, but now it returns an array of `Place` objects with the bearing calculated, and it accepts an optional AbortSignal for cancellation. This will be useful to cancel the request if the user moves or changes location before the fetch completes.
+  const wikiHeaders = new Headers({
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
+  });
+
   export async function fetchNearbyPlaces(
     userCoord: Coordinate,
     radius: number = SEARCH_RADIUS,
@@ -31,7 +36,8 @@ import { SEARCH_RADIUS } from '../constants/config';
       `https://en.wikipedia.org/w/api.php?action=query&list=geosearch` +
       `&gscoord=${userCoord.latitude}|${userCoord.longitude}` +
       `&gsradius=${radius}&gslimit=50&format=json&origin=*`;
-    const res = await fetch(url, { signal });
+
+    const res = await fetch(url, { signal, method: 'GET', headers: wikiHeaders });
     const data: GeoSearchResponse = await res.json();
     return data.query.geosearch.map((p) => ({
       id: p.pageid,
@@ -43,7 +49,6 @@ import { SEARCH_RADIUS } from '../constants/config';
     }));
   }
 
-  // Given a specific Place, thiscalls a different Wikipedia endpoint to get the short description (extract) and a thumbnail image and only runs when you're pointing at a specific building
   export async function fetchPlaceDetail(
     place: Place,
     signal?: AbortSignal
@@ -52,7 +57,8 @@ import { SEARCH_RADIUS } from '../constants/config';
       `https://en.wikipedia.org/w/api.php?action=query&pageids=${place.id}` +
       `&prop=extracts|pageimages&exintro&explaintext&exsentences=3` +
       `&piprop=thumbnail&pithumbsize=300&format=json&origin=*`;
-    const res = await fetch(url, { signal });
+
+    const res = await fetch(url, { signal, method: 'GET', headers: wikiHeaders });
     const data: ExtractResponse = await res.json();
     const page = data.query.pages[String(place.id)];
     return {
@@ -61,4 +67,3 @@ import { SEARCH_RADIUS } from '../constants/config';
       thumbnail: page?.thumbnail?.source,
     };
   }
-  
