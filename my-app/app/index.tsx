@@ -1,5 +1,6 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
 
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -21,14 +22,16 @@ export default function App() {
   }
 
   // The Constants
+  const router = useRouter();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [locationStatus, requestLocationPermission] = Location.useForegroundPermissions();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // The defined Functions 
   // Get location from device and return it as [lat, lon]
-  let getLocation = function() {
-    let locationData = Location.getCurrentPositionAsync({});
-    if(locationData.length > 2)
+  let getLocation = async function() {
+    let locationData = await Location.getCurrentPositionAsync({});
+    if(locationData)
       return {lat: locationData.coords.latitude,
               lon: locationData.coords.longitude};
     else 
@@ -47,10 +50,22 @@ export default function App() {
   };
 
 
-  let searchLocation = function() {
-    let location = getLocation();
-    let places   = fetchWikiPlaces(location.lat, location.lon);
+  let searchLocation = async function() {
+    let location = await getLocation();
+    let places   = await fetchWikiPlaces(location.lat, location.lon);
   }
+
+  // Request location permissions on mount
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const {status: locationPermission} = await Location.requestForegroundPermissionsAsync();
+      if (locationPermission != 'granted') {
+        // Location permissions are not granted yet.
+        requestLocationPermission();
+      }
+    };
+    requestPermissions();
+  }, []);
 
   // The functions
   if (!cameraPermission || !locationStatus) {
@@ -62,13 +77,6 @@ export default function App() {
   if (!cameraPermission.granted) {
     // Camera permissions are not granted yet.
     requestCameraPermission();
-  }
-
-  // Check location permissions
-  let {locationPermission} = Location.requestForegroundPermissionsAsync();
-  if (locationPermission != 'granted') {
-    // Location permissions are not granted yet.
-    requestLocationPermission();
   }
 
   // The UI stuff
@@ -104,7 +112,7 @@ export default function App() {
           </View>
         )}
       </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -130,6 +138,11 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     alignItems: 'center',
+  },
+  text: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   hamburgerText: {
     color: 'white',
