@@ -10,6 +10,7 @@ import { AROverlay } from '../components/AROverlay';
 import { PlaceInfoCard } from '../components/PlaceInfoCard';
 import { fetchNearbyPlaces, fetchPlaceDetail } from '../utils/wiki';
 import { angleDiff } from '../utils/geo';
+import { summarizePlace } from '../services/gemini';
 import { HEADING_TOLERANCE } from '../constants/config';
 import { PlaceDetail } from '../types';
 
@@ -26,7 +27,8 @@ export default function App() {
   const places = usePlaces(autoDetect ? coord : null);
   const { targeted, isLoading } = useTargetedPlace(
     autoDetect ? places : [],
-    heading
+    heading,
+    gemini
   );
 
   // Manual-mode state
@@ -49,6 +51,11 @@ export default function App() {
       }
       if (best) {
         const detail = await fetchPlaceDetail(best);
+        if (gemini) {
+          try {
+            detail.geminiSummary = await summarizePlace(detail.title, detail.extract);
+          } catch {}
+        }
         setManualResult(detail);
       } else {
         setManualResult(null);
