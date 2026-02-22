@@ -2,13 +2,13 @@ import { Stack } from "expo-router";
 import { SettingsProvider } from "../context/SettingsContext";
 
 export default function RootLayout() {
-  return (
+  return ( 
     <SettingsProvider>
       <Stack
-        screenOptions={{
+          screenOptions={{
           headerShown: false,
         }}>
-      <Stack.Screen name="index" />
+        <Stack.Screen name="index" />
       </Stack>
     </SettingsProvider>
   );
