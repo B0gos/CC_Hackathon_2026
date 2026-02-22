@@ -27,20 +27,25 @@ import { SEARCH_RADIUS } from '../constants/config';
     radius: number = SEARCH_RADIUS,
     signal?: AbortSignal
   ): Promise<Place[]> {
+
     const headers = new Headers({
         "Accept"       : "application/json",
         "Content-Type" : "application/json",
         "User-Agent"   : "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
       });
+
     const url =
       `https://en.wikipedia.org/w/api.php?action=query&list=geosearch` +
       `&gscoord=${userCoord.latitude}|${userCoord.longitude}` +
       `&gsradius=${radius}&gslimit=50&format=json&origin=*`;
+
     const res = await fetch(url, { 
             signal,
             method  : 'GET', 
             headers : headers
           });
+=
+    const res = await fetch(url, { signal });
     const data: GeoSearchResponse = await res.json();
     return data.query.geosearch.map((p) => ({
       id: p.pageid,
@@ -57,6 +62,7 @@ import { SEARCH_RADIUS } from '../constants/config';
     place: Place,
     signal?: AbortSignal
   ): Promise<PlaceDetail> {
+
     const headers = new Headers({
         "Accept"       : "application/json",
         "Content-Type" : "application/json",
@@ -71,6 +77,8 @@ import { SEARCH_RADIUS } from '../constants/config';
               method  : 'GET', 
               headers : headers
             });
+
+    const res = await fetch(url, { signal });
     const data: ExtractResponse = await res.json();
     const page = data.query.pages[String(place.id)];
     return {
@@ -78,4 +86,5 @@ import { SEARCH_RADIUS } from '../constants/config';
       extract: page?.extract ?? 'No description available.',
       thumbnail: page?.thumbnail?.source,
     };
-  }
+}
+

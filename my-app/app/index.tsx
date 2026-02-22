@@ -18,7 +18,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
   const { distance, gemini, tts } = useSettings();
-  const [showModal, setShowModal] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -34,6 +33,7 @@ export default function App() {
   const [manualResult, setManualResult] = useState<PlaceDetail | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
+<<<<<<< HEAD
   // Initialize magnetometer to get compass heading
   /*useEffect(() => {
     Magnetometer.setUpdateInterval(500);
@@ -154,6 +154,7 @@ export default function App() {
         setManualResult(null);
       }
 
+
       const places = await fetchWikiPlaces(location.lat, location.lon);
       const closestInDirection = filterResultsByDirection(places, location.lat, location.lon, heading);
       setSearchResults(closestInDirection);
@@ -176,6 +177,7 @@ export default function App() {
         <Text style={styles.message}>Camera permission is required</Text>
       </View>
     );
+
   }
 
   if (locationGranted === false) {
@@ -196,13 +198,14 @@ export default function App() {
         >
           <Text style={styles.text}>{isSearching ? 'Searching...' : 'Find Nearby'}</Text>
         </TouchableOpacity> */
-return (
+  return (
     <Pressable style={styles.container} onPress={() => setMenuOpen(false)}>
       <CameraView style={styles.camera} facing="back" />
 
       {/* ── Auto-detect mode ── */}
       {autoDetect && <AROverlay targeted={targeted} isLoading={isLoading} />}
       {autoDetect && targeted && <PlaceInfoCard place={targeted} />}
+
 
       {autoDetect && !coord && (
         <View style={styles.statusBanner}>
@@ -243,6 +246,7 @@ return (
         </View>
       )}
 
+
       {/*  Monument Popup 
       { showModal && (
           <MonumentInfoModal
@@ -255,6 +259,7 @@ return (
           }
         />
       ) */}
+
 
       {/* ── Hamburger menu ── */}
       <View style={styles.hamburgerContainer}>
