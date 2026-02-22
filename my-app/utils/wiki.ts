@@ -61,3 +61,4 @@ import { SEARCH_RADIUS } from '../constants/config';
       thumbnail: page?.thumbnail?.source,
     };
   }
+  
