@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable, Switch } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { useSettings } from '../context/SettingsContext';
@@ -11,7 +11,7 @@ import { PlaceInfoCard } from '../components/PlaceInfoCard';
 import { fetchNearbyPlaces, fetchPlaceDetail } from '../utils/wiki';
 import { angleDiff } from '../utils/geo';
 import { summarizePlace } from '../services/gemini';
-import { HEADING_TOLERANCE } from '../constants/config';
+import { HEADING_TOLERANCE, SEARCH_RADIUS } from '../constants/config';
 import { PlaceDetail } from '../types';
 
 export default function App() {
@@ -22,9 +22,16 @@ export default function App() {
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
+  useEffect(() => {
+    if (cameraPermission && !cameraPermission.granted) {
+      requestCameraPermission();
+    }
+  }, [cameraPermission]);
+
   // Hooks always run (React rule) — gated by what we pass in
   const { coord, heading, permissionGranted: locationGranted } = useLocation();
-  const places = usePlaces(autoDetect ? coord : null);
+  const searchRadius = parseInt(distance) || SEARCH_RADIUS;
+  const places = usePlaces(autoDetect ? coord : null, searchRadius);
   const { targeted, isLoading } = useTargetedPlace(
     autoDetect ? places : [],
     heading,
@@ -39,7 +46,7 @@ export default function App() {
     if (!coord) return;
     setIsSearching(true);
     try {
-      const results = await fetchNearbyPlaces(coord);
+      const results = await fetchNearbyPlaces(coord, searchRadius);
       let best = null;
       let bestDiff = Infinity;
       for (const place of results) {
@@ -67,12 +74,7 @@ export default function App() {
     }
   };
 
-  if (!cameraPermission) {
-    return <View style={styles.container} />;
-  }
-
-  if (!cameraPermission.granted) {
-    requestCameraPermission();
+  if (!cameraPermission?.granted) {
     return (
       <View style={styles.messageContainer}>
         <Text style={styles.message}>Camera permission is required</Text>
@@ -94,7 +96,7 @@ export default function App() {
 
       {/* ── Auto-detect mode ── */}
       {autoDetect && <AROverlay targeted={targeted} isLoading={isLoading} />}
-      {autoDetect && targeted && <PlaceInfoCard place={targeted} />}
+      {autoDetect && targeted && <PlaceInfoCard place={targeted} tts={tts} />}
 
       {autoDetect && !coord && (
         <View style={styles.statusBanner}>
@@ -120,8 +122,10 @@ export default function App() {
       )}
 
       {/* ── Manual mode ── */}
-      {!autoDetect && manualResult && <PlaceInfoCard place={manualResult} />}
-      {!autoDetect && (
+      {!autoDetect && manualResult && (
+        <PlaceInfoCard place={manualResult} tts={tts} onClose={() => setManualResult(null)} />
+      )}
+      {!autoDetect && !manualResult && (
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, isSearching && styles.buttonDisabled]}
@@ -236,12 +240,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'transparent',
     width: '100%',
-    paddingHorizontal: 64,
+    paddingHorizontal: 100,
   },
   button: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
     backgroundColor: '#000016',
     borderRadius: 8,
   },
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#888888',
   },
   buttonText: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
   },
