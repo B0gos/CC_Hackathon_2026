@@ -2,18 +2,33 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+<<<<<<< HEAD
    width="128mm"
    height="128mm"
    viewBox="0 0 128 128"
+=======
+   width="256mm"
+   height="256mm"
+   viewBox="0 0 256 256"
+>>>>>>> d300aab2ea235eb29ee2abd9cbe099f7b1e42e15
    version="1.1"
    id="svg1"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    sodipodi:docname="icon.svg"
+<<<<<<< HEAD
    inkscape:export-filename="icon.png"
    inkscape:export-xdpi="25.4"
    inkscape:export-ydpi="25.4"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+=======
+   inkscape:export-filename="my-app/assets/images/android-icon-background.png"
+   inkscape:export-xdpi="50.799999"
+   inkscape:export-ydpi="50.799999"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+>>>>>>> d300aab2ea235eb29ee2abd9cbe099f7b1e42e15
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -26,9 +41,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
+<<<<<<< HEAD
      inkscape:zoom="0.90688833"
      inkscape:cx="396.96177"
      inkscape:cy="351.75224"
+=======
+     inkscape:zoom="0.45344416"
+     inkscape:cx="539.20642"
+     inkscape:cy="509.43428"
+>>>>>>> d300aab2ea235eb29ee2abd9cbe099f7b1e42e15
      inkscape:window-width="1896"
      inkscape:window-height="1226"
      inkscape:window-x="0"
@@ -36,12 +57,39 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
+<<<<<<< HEAD
      id="defs1" />
+=======
+     id="defs1">
+    <linearGradient
+       id="linearGradient3"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000016;stop-opacity:1;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0.93047845"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3"
+       id="linearGradient4"
+       x1="44.024422"
+       y1="31.397154"
+       x2="211.97556"
+       y2="224.60283"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+>>>>>>> d300aab2ea235eb29ee2abd9cbe099f7b1e42e15
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
     <rect
+<<<<<<< HEAD
        style="fill:#000016;fill-opacity:1;stroke:#000016;stroke-width:0;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect8"
        width="128"
@@ -88,5 +136,45 @@
        inkscape:randomized="0"
        d="M 117.57466,18.963654 66.056638,33.828421 14.538619,48.693189 27.424363,-3.3551079 40.310106,-55.403405 l 38.632275,37.18353 z"
        transform="matrix(-0.03271162,-0.41527536,0.41527536,-0.03271162,45.029918,69.267105)" />
+=======
+       style="fill:url(#linearGradient4);stroke:#000016;stroke-width:0.181871;stroke-linejoin:round"
+       id="rect1"
+       width="255.81813"
+       height="255.81813"
+       x="0.090935349"
+       y="0.090935349"
+       rx="63.954533"
+       ry="63.954533" />
+    <circle
+       style="fill:#e0e0e0;fill-opacity:1;stroke:#000016;stroke-width:0.182;stroke-linejoin:round"
+       id="path2"
+       cx="131.30524"
+       cy="127.47354"
+       r="80" />
+    <circle
+       style="fill:#000016;fill-opacity:1;stroke:#000016;stroke-width:0.182;stroke-linejoin:round"
+       id="path2-3"
+       cx="108.61138"
+       cy="108.67075"
+       r="60" />
+    <path
+       sodipodi:type="star"
+       style="fill:#e0e0e0;fill-opacity:1;stroke:#e0e0e0;stroke-width:12;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="path3"
+       inkscape:flatsided="false"
+       sodipodi:sides="3"
+       sodipodi:cx="46.623203"
+       sodipodi:cy="34.245361"
+       sodipodi:r1="89.456017"
+       sodipodi:r2="44.728008"
+       sodipodi:arg1="0.52143444"
+       sodipodi:arg2="1.568632"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 124.19101,78.805591 46.720009,78.973265 -30.750992,79.140938 7.8392996,11.965246 46.429591,-55.210446 85.310301,11.797573 Z"
+       inkscape:transform-center-x="-0.05532238"
+       inkscape:transform-center-y="-12.732616"
+       transform="matrix(0.5714789,0,0,0.5714789,54.651734,66.379586)" />
+>>>>>>> d300aab2ea235eb29ee2abd9cbe099f7b1e42e15
   </g>
 </svg>
