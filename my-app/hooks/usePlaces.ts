@@ -22,6 +22,6 @@ export function usePlaces(coord: Coordinate | null): Place[] {
         })
         .catch(() => {});
       return () => controller.abort();
-    }, [coord?.latitude, coord?.longitude]);
+    }, [coord]);
     return places;
   }
