@@ -1,11 +1,25 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View, Pressable} from 'react-native';
 import { useState, useEffect } from 'react';
+
+import { useRouter } from 'expo-router';
+import { useSettings } from '../context/SettingsContext';
+import MonumentInfoModal from '../components/MonumentInfoModal';
 
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import { Magnetometer } from 'expo-sensors';
 
 export default function App() {
+  // Expo Router
+  const router = useRouter();
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [showModal, setShowModal] = useState(false);
+
+  //  Global settings access
+  const { distance, gemini, tts } = useSettings();
+
   // Interfaces
   interface GeoSearchResult {
     pageid: number;
@@ -153,18 +167,33 @@ export default function App() {
 
   // The UI stuff
   return (
-    <View style={styles.container}>
-      <CameraView style={styles.camera} facing='back' />
+      <Pressable
+        style={styles.container}
+        onPress={() => setMenuOpen(false)} 
+      >
 
-      {/* Display search results */}
+        <CameraView style={styles.camera} facing='back' />
+
+        {/*  Monument Popup */}
+       <MonumentInfoModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          title="Sample Monument"
+          summary={
+            gemini
+              ? "This is where the Gemini AI summary will appear."
+              : "This is where the static summary will appear."
+          }
+        />
+
+      {/* Display search results 
       {searchResults && (
         <View style={styles.resultContainer}>
           <Text style={styles.resultTitle}>{searchResults.title}</Text>
           <Text style={styles.resultDistance}>Distance: {Math.round(searchResults.dist)}m</Text>
         </View>
-      )}
-
-      {/* Search button */}
+      )} */}
+      { /* Search button */ }
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, isSearching && styles.buttonDisabled]}
@@ -174,7 +203,42 @@ export default function App() {
           <Text style={styles.text}>{isSearching ? 'Searching...' : 'Find Nearby'}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+
+
+        {/* Hamburger */}
+        <View style={styles.hamburgerContainer}>
+          <TouchableOpacity
+            style={styles.hamburgerButton}
+            onPress={() => setMenuOpen(!menuOpen)}
+          >
+            <Text style={styles.hamburgerText}>☰</Text>
+          </TouchableOpacity>
+
+          {menuOpen && (
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setMenuOpen(false);
+                  router.push('/faq');
+                }}
+              >
+                <Text style={styles.dropdownText}>FAQ</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setMenuOpen(false);
+                  router.push('/settings');
+                }}
+              >
+                <Text style={styles.dropdownText}>Settings</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+    </Pressable>
   );
 }
 
@@ -183,46 +247,16 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
   },
   camera: {
     flex: 1,
   },
-  headingDisplay: {
-    position: 'absolute',
-    top: 50,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  headingText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  resultContainer: {
-    position: 'absolute',
-    top: 120,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: 10,
-    padding: 15,
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  resultTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  resultDistance: {
-    color: '#4CAF50',
-    fontSize: 14,
-  },
+
+  // Search Button
   buttonContainer: {
     position: 'absolute',
     bottom: 64,
@@ -235,7 +269,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#000016',
     borderRadius: 8,
   },
   buttonDisabled: {
@@ -245,6 +279,38 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
+  },
+
+  //  Hamburger
+  hamburgerContainer: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    alignItems: 'flex-end',
+  },
+  hamburgerButton: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 12,
+    borderRadius: 8,
+  },
+  hamburgerText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  dropdown: {
+    marginTop: 8,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  dropdownText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 
