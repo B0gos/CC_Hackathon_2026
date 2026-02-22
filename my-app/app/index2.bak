@@ -18,7 +18,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
   const { distance, gemini, tts } = useSettings();
-  const [showModal, setShowModal] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -34,8 +33,9 @@ export default function App() {
   const [manualResult, setManualResult] = useState<PlaceDetail | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
+<<<<<<< HEAD
   // Initialize magnetometer to get compass heading
-  /*useEffect(() => {
+  useEffect(() => {
     Magnetometer.setUpdateInterval(500);
     
     const subscription = Magnetometer.addListener(({ x, y, z }) => {
@@ -47,10 +47,9 @@ export default function App() {
     });
 
     return () => subscription.remove();
-  }, []); */
+  }, []);
 
   // Request location permissions on mount
-  /*
   useEffect(() => {
     const requestPermissions = async () => {
       if (locationStatus?.status !== 'granted') {
@@ -58,7 +57,7 @@ export default function App() {
       }
     };
     requestPermissions();
-  }, [locationStatus]); */
+  }, [locationStatus]);
 
   // Helper function: Calculate bearing from point A to point B
   const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -98,7 +97,7 @@ export default function App() {
   };
 
   // Get location from device
-  /*const getLocation = async () => {
+  const getLocation = async () => {
     try {
       const location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
       return {
@@ -108,7 +107,8 @@ export default function App() {
     } catch (error) {
       console.error('Error getting location:', error);
       return null;
-    } };*/
+    }
+  };
 
   // Fetch places from Wikipedia geosearch API
   const fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
@@ -133,6 +133,8 @@ export default function App() {
   };
 
   // Main search function: Get location, heading, and find closest place in direction
+=======
+>>>>>>> f4a1160bdb4cf8765d3686cbc58d53833f1590ed
   const searchLocation = async () => {
     if (!coord) return;
     setIsSearching(true);
@@ -153,11 +155,14 @@ export default function App() {
       } else {
         setManualResult(null);
       }
+<<<<<<< HEAD
 
       const places = await fetchWikiPlaces(location.lat, location.lon);
       const closestInDirection = filterResultsByDirection(places, location.lat, location.lon, heading);
       setSearchResults(closestInDirection);
       setShowModal(true);
+=======
+>>>>>>> f4a1160bdb4cf8765d3686cbc58d53833f1590ed
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -178,16 +183,30 @@ export default function App() {
     );
   }
 
-  if (locationGranted === false) {
-    return (
-      <View style={styles.messageContainer}>
-        <Text style={styles.message}>Location permission is required</Text>
-      </View>
-    );
-  }
-
+<<<<<<< HEAD
   // The UI stuff
-      /*   Search button 
+  return (
+      <Pressable
+        style={styles.container}
+        onPress={() => setMenuOpen(false)} 
+      >
+
+        <CameraView style={styles.camera} facing='back' />
+
+      {/*  Monument Popup */}
+      {showModal && (
+          <MonumentInfoModal
+            onClose={() => setShowModal(false)}
+            title={searchResults.title}
+          summary={
+            gemini
+              ? "This is where the Gemini AI summary will appear."
+              : "This is where the static summary will appear."
+          }
+        />
+      )}
+
+      { /* Search button */ }
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, isSearching && styles.buttonDisabled]}
@@ -195,8 +214,18 @@ export default function App() {
           disabled={isSearching}
         >
           <Text style={styles.text}>{isSearching ? 'Searching...' : 'Find Nearby'}</Text>
-        </TouchableOpacity> */
-return (
+        </TouchableOpacity>
+=======
+  if (locationGranted === false) {
+    return (
+      <View style={styles.messageContainer}>
+        <Text style={styles.message}>Location permission is required</Text>
+>>>>>>> f4a1160bdb4cf8765d3686cbc58d53833f1590ed
+      </View>
+    );
+  }
+
+  return (
     <Pressable style={styles.container} onPress={() => setMenuOpen(false)}>
       <CameraView style={styles.camera} facing="back" />
 
@@ -242,19 +271,6 @@ return (
           </TouchableOpacity>
         </View>
       )}
-
-      {/*  Monument Popup 
-      { showModal && (
-          <MonumentInfoModal
-            onClose={() => setShowModal(false)}
-            title={searchResults.title}
-          summary={
-            gemini
-              ? "This is where the Gemini AI summary will appear."
-              : "This is where the static summary will appear."
-          }
-        />
-      ) */}
 
       {/* ── Hamburger menu ── */}
       <View style={styles.hamburgerContainer}>
