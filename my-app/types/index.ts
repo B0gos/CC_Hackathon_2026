@@ -15,4 +15,5 @@ export interface Coordinate {
   export interface PlaceDetail extends Place {
     extract: string;
     thumbnail?: string;
+    geminiSummary?: string;
   }

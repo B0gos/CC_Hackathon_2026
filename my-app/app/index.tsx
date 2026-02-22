@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable, Switch } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { useSettings } from '../context/SettingsContext';
@@ -10,7 +10,8 @@ import { AROverlay } from '../components/AROverlay';
 import { PlaceInfoCard } from '../components/PlaceInfoCard';
 import { fetchNearbyPlaces, fetchPlaceDetail } from '../utils/wiki';
 import { angleDiff } from '../utils/geo';
-import { HEADING_TOLERANCE } from '../constants/config';
+import { summarizePlace } from '../services/gemini';
+import { HEADING_TOLERANCE, SEARCH_RADIUS } from '../constants/config';
 import { PlaceDetail } from '../types';
 
 export default function App() {
@@ -18,16 +19,23 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
   const { distance, gemini, tts } = useSettings();
-  const [isSearchHidden, setIsSearchHidden] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
+  useEffect(() => {
+    if (cameraPermission && !cameraPermission.granted) {
+      requestCameraPermission();
+    }
+  }, [cameraPermission]);
+
   // Hooks always run (React rule) — gated by what we pass in
   const { coord, heading, permissionGranted: locationGranted } = useLocation();
-  const places = usePlaces(autoDetect ? coord : null);
+  const searchRadius = parseInt(distance) || SEARCH_RADIUS;
+  const places = usePlaces(autoDetect ? coord : null, searchRadius);
   const { targeted, isLoading } = useTargetedPlace(
     autoDetect ? places : [],
-    heading
+    heading,
+    gemini
   );
 
   // Manual-mode state
@@ -138,7 +146,7 @@ export default function App() {
     if (!coord) return;
     setIsSearching(true);
     try {
-      const results = await fetchNearbyPlaces(coord);
+      const results = await fetchNearbyPlaces(coord, searchRadius);
       let best = null;
       let bestDiff = Infinity;
       for (const place of results) {
@@ -150,15 +158,17 @@ export default function App() {
       }
       if (best) {
         const detail = await fetchPlaceDetail(best);
+        if (gemini) {
+          try {
+            detail.geminiSummary = await summarizePlace(detail.title, detail.extract);
+          } catch {}
+        }
         setManualResult(detail);
-        setIsSearchHidden(true);
         setIsFound(true);
       } else {
         setManualResult(null);
-        setIsSearchHidden(false);
         setIsFound(false);
       }
-
 
 /*
       const places = await fetchWikiPlaces(location.lat, location.lon);
@@ -167,22 +177,16 @@ export default function App() {
     } catch (error) {
       console.error('Search error:', error);
     } finally {
-      setIsSearching(false); 
+      setIsSearching(false);
     }
   };
 
-  if (!cameraPermission) {
-    return <View style={styles.container} />;
-  }
-
-  if (!cameraPermission.granted) {
-    requestCameraPermission();
+  if (!cameraPermission?.granted) {
     return (
       <View style={styles.messageContainer}>
         <Text style={styles.message}>Camera permission is required</Text>
       </View>
     );
-
   }
 
   if (locationGranted === false) {
@@ -209,8 +213,7 @@ export default function App() {
 
       {/* ── Auto-detect mode ── */}
       {autoDetect && <AROverlay targeted={targeted} isLoading={isLoading} />}
-      {autoDetect && targeted && <PlaceInfoCard place={targeted} />}
-
+      {autoDetect && targeted && <PlaceInfoCard place={targeted} tts={tts} />}
 
       {autoDetect && !coord && (
         <View style={styles.statusBanner}>
@@ -236,8 +239,11 @@ export default function App() {
       )}
 
       {/* ── Manual mode ── */}
-      {!autoDetect && manualResult && isSearchHidden && <PlaceInfoCard place={manualResult} />}
-      {!autoDetect  && <View style={styles.buttonContainer}>
+      {!autoDetect && manualResult && (
+        <PlaceInfoCard place={manualResult} tts={tts} onClose={() => setManualResult(null)} />
+      )}
+      {!autoDetect && !manualResult && (
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, isSearching && styles.buttonDisabled]}
             onPress={searchLocation}
@@ -249,15 +255,7 @@ export default function App() {
             </Text>
           </TouchableOpacity>
         </View>
-      }
-
-      {/* Close button 
-      {isSearchHidden && <View style={styles.buttoncontainer}>
-          <TouchableOpacity style={styles.button} onPress={console.log('Something went wr2ong')}>
-              <Text style={styles.buttontext}>Close</Text>
-          </TouchableOpacity>
-        </View>} */}
-    
+      )}
 
       {/*  Monument Popup 
       { showModal && (
@@ -271,7 +269,6 @@ export default function App() {
           }
         />
       ) */}
-
 
       {/* ── Hamburger menu ── */}
       <View style={styles.hamburgerContainer}>
@@ -374,12 +371,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'transparent',
     width: '100%',
-    paddingHorizontal: 64,
+    paddingHorizontal: 100,
   },
   button: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
     backgroundColor: '#000016',
     borderRadius: 8,
   },
@@ -387,7 +384,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#888888',
   },
   buttonText: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
   },
