@@ -107,7 +107,7 @@ export default function App() {
   // Get location from device
   const getLocation = async () => {
     try {
-      const location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
       return {
         lat: location.coords.latitude,
         lon: location.coords.longitude
@@ -121,13 +121,21 @@ export default function App() {
   // Fetch places from Wikipedia geosearch API
   const fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
     try {
-      const response = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=1000&format=json&origin=*`
-      );
+      let headers = new Headers({
+        "Accept"       : "application/json",
+        "Content-Type" : "application/json",
+        "User-Agent"   : "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0"
+      });
+      const response = await fetch( 
+        `https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=1000&format=json&origin=*`,
+          {    
+            method  : 'GET', 
+            headers : headers
+        });
       const data: WikiApiResponse = await response.json();
       return data.query.geosearch || [];
     } catch (error) {
-      console.error('Error fetching wiki places:', error);
+      console.error('Error fetching wiki places: ', error);
       return [];
     }
   };
@@ -146,6 +154,7 @@ export default function App() {
       const places = await fetchWikiPlaces(location.lat, location.lon);
       const closestInDirection = filterResultsByDirection(places, location.lat, location.lon, heading);
       setSearchResults(closestInDirection);
+      setShowModal(true);
     } catch (error) {
       console.error('Error during search:', error);
     } finally {
@@ -174,25 +183,19 @@ export default function App() {
 
         <CameraView style={styles.camera} facing='back' />
 
-        {/*  Monument Popup */}
-       <MonumentInfoModal
-          visible={showModal}
-          onClose={() => setShowModal(false)}
-          title="Sample Monument"
+      {/*  Monument Popup */}
+      {showModal && (
+          <MonumentInfoModal
+            onClose={() => setShowModal(false)}
+            title={searchResults.title}
           summary={
             gemini
               ? "This is where the Gemini AI summary will appear."
               : "This is where the static summary will appear."
           }
         />
+      )}
 
-      {/* Display search results 
-      {searchResults && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.resultTitle}>{searchResults.title}</Text>
-          <Text style={styles.resultDistance}>Distance: {Math.round(searchResults.dist)}m</Text>
-        </View>
-      )} */}
       { /* Search button */ }
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -285,8 +288,8 @@ const styles = StyleSheet.create({
   hamburgerContainer: {
     position: 'absolute',
     top: 60,
-    right: 20,
-    alignItems: 'flex-end',
+    left: 20,
+    alignItems: 'flex-start',
   },
   hamburgerButton: {
     backgroundColor: 'rgba(0,0,0,0.6)',
