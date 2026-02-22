@@ -10,11 +10,18 @@ import {
 
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
+import { useSettings } from '../context/SettingsContext';
+import MonumentInfoModal from '../components/MonumentInfoModal';
 
 export default function Index() {
   const router = useRouter();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
+  const [showModal, setShowModal] = useState(false);
+
+  //  Global settings access
+  const { distance, gemini, tts } = useSettings();
 
   if (!permission) return <View />;
 
@@ -35,6 +42,26 @@ export default function Index() {
       onPress={() => setMenuOpen(false)}
     >
       <CameraView style={styles.camera} facing="back" />
+
+      {/*  Monument Popup */}
+      <MonumentInfoModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        title="Sample Monument"
+        summary={
+          gemini
+            ? "This is where the Gemini AI summary will appear."
+            : "This is where the static summary will appear."
+        }
+      />
+
+      {/*  Temporary Test Button */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={() => setShowModal(true)}
+      >
+        <Text style={styles.testText}>Test Popup</Text>
+      </TouchableOpacity>
 
       {/* Hamburger */}
       <View style={styles.hamburgerContainer}>
@@ -84,6 +111,20 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+
+  //  Test Button
+  testButton: {
+    position: 'absolute',
+    bottom: 120,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 8,
+  },
+  testText: {
+    fontWeight: 'bold',
+  },
+
   hamburgerContainer: {
     position: 'absolute',
     top: 60,
