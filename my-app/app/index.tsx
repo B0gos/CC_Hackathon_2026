@@ -1,16 +1,22 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Pressable,
+} from 'react-native';
+
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useRouter } from 'expo-router';
 
 export default function Index() {
-  // ===== STATE =====
-  const [permission, requestPermission] = useCameraPermissions();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
 
-  // ===== PERMISSION HANDLING =====
-  if (!permission) {
-    return <View />;
-  }
+  if (!permission) return <View />;
 
   if (!permission.granted) {
     return (
@@ -18,45 +24,55 @@ export default function Index() {
         <Text style={styles.message}>
           We need your permission to use the camera
         </Text>
-        <Button onPress={requestPermission} title="Grant Permission" />
+        <Button onPress={requestPermission} title="Grant permission" />
       </View>
     );
   }
 
-  // ===== MAIN UI =====
   return (
-    <View style={styles.container}>
-      {/* Camera background */}
+    <Pressable
+      style={styles.container}
+      onPress={() => setMenuOpen(false)}
+    >
       <CameraView style={styles.camera} facing="back" />
 
-      {/* Hamburger Button */}
-      <TouchableOpacity
-        style={styles.hamburger}
-        onPress={() => setMenuOpen(!menuOpen)}
-      >
-        <Text style={styles.hamburgerText}>☰</Text>
-      </TouchableOpacity>
-
-      {/* Hamburger Menu */}
-      {menuOpen && (
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>FAQ</Text>
-          </TouchableOpacity>          
-        </View>
-      )}
-
-      {/* Bottom Button (placeholder) */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.text}>Button</Text>
+      {/* Hamburger */}
+      <View style={styles.hamburgerContainer}>
+        <TouchableOpacity
+          style={styles.hamburgerButton}
+          onPress={() => setMenuOpen(!menuOpen)}
+        >
+          <Text style={styles.hamburgerText}>☰</Text>
         </TouchableOpacity>
+
+        {menuOpen && (
+          <View style={styles.dropdown}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => {
+                setMenuOpen(false);
+                router.push('/faq');
+              }}
+            >
+              <Text style={styles.dropdownText}>FAQ</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => {
+                setMenuOpen(false);
+                router.push('/settings');
+              }}
+            >
+              <Text style={styles.dropdownText}>Settings</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    </View>
+    </Pressable>
   );
 }
 
-// ===== STYLES =====
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -68,55 +84,34 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
-  // Bottom button
-  buttonContainer: {
+  hamburgerContainer: {
     position: 'absolute',
-    bottom: 64,
-    width: '100%',
-    alignItems: 'center',
+    top: 60,
+    right: 20,
+    alignItems: 'flex-end',
   },
-  button: {
+  hamburgerButton: {
     backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 12,
     borderRadius: 8,
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-
-  
-  // Hamburger menu
-  hamburger: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-  },
-
   hamburgerText: {
-    fontSize: 32,
     color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
   },
-
-  menu: {
-    position: 'absolute',
-    top: 95,
-    right: 20,
+  dropdown: {
+    marginTop: 8,
     backgroundColor: 'rgba(0,0,0,0.85)',
     borderRadius: 8,
-    padding: 12,
-    zIndex: 9,
+    overflow: 'hidden',
   },
-
-  menuItem: {
-    paddingVertical: 10,
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
   },
-
-  menuText: {
+  dropdownText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
   },
 });
