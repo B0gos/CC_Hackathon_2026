@@ -33,6 +33,7 @@ export default function App() {
   // Manual-mode state
   const [manualResult, setManualResult] = useState<PlaceDetail | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isFound, setIsFound] = useState(true);
 
   // Initialize magnetometer to get compass heading
   /*useEffect(() => {
@@ -150,11 +151,12 @@ export default function App() {
       if (best) {
         const detail = await fetchPlaceDetail(best);
         setManualResult(detail);
-        setIsSearchHidden(true)
+        setIsSearchHidden(true);
+        setIsFound(true);
       } else {
         setManualResult(null);
-        setIsSearchHidden(false)
-
+        setIsSearchHidden(false);
+        setIsFound(false);
       }
 
 
@@ -242,7 +244,8 @@ export default function App() {
             disabled={isSearching}
           >
             <Text style={styles.buttonText}>
-              {isSearching ? 'Searching...' : 'Find Nearby'}
+              {isSearching ? 'Searching...' : isFound ? 'Find Nearby' : 'Not Found'}
+
             </Text>
           </TouchableOpacity>
         </View>

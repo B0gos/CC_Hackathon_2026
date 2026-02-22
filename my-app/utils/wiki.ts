@@ -44,8 +44,7 @@ import { SEARCH_RADIUS } from '../constants/config';
             method  : 'GET', 
             headers : headers
           });
-=
-    const res = await fetch(url, { signal });
+
     const data: GeoSearchResponse = await res.json();
     return data.query.geosearch.map((p) => ({
       id: p.pageid,
@@ -78,7 +77,6 @@ import { SEARCH_RADIUS } from '../constants/config';
               headers : headers
             });
 
-    const res = await fetch(url, { signal });
     const data: ExtractResponse = await res.json();
     const page = data.query.pages[String(place.id)];
     return {
