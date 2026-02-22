@@ -5,6 +5,21 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 
 export default function App() {
+  // Intefaces
+  interface GeoSearchResult {
+    pageid: number;
+    title: string;
+    lat: number;
+    lon: number;
+    dist: number;
+  }
+
+  interface WikiApiResponse {
+    query: {
+      geosearch: GeoSearchResult[];
+    };
+  }
+
   // The Constants
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [locationStatus, requestLocationPermission] = Location.useForegroundPermissions();
@@ -12,8 +27,29 @@ export default function App() {
   // The defined Functions 
   // Get location from device and return it as [lat, lon]
   let getLocation = function() {
-    let location = Location.getCurrentPositionAsync({});
-    return [location.coords.latitude, location.coords.longitude];
+    let locationData = Location.getCurrentPositionAsync({});
+    if(locationData.length > 2)
+      return {lat: locationData.coords.latitude,
+              lon: locationData.coords.longitude};
+    else 
+      // Handle error here
+      return {lat: 0.0,
+              lon: 0.0};
+  }
+
+  let fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
+    const response = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=500&format=json&origin=*`
+    );
+
+    const data: WikiApiResponse = await response.json();
+    return data.query.geosearch;
+  };
+
+
+  let searchLocation = function() {
+    let location = getLocation();
+    let places   = fetchWikiPlaces(location.lat, location.lon);
   }
 
   // The functions
@@ -35,35 +71,12 @@ export default function App() {
     requestLocationPermission();
   }
 
-  interface GeoSearchResult {
-    pageid: number;
-    title: string;
-    lat: number;
-    lon: number;
-    dist: number;
-  }
-
-  interface WikiApiResponse {
-    query: {
-      geosearch: GeoSearchResult[];
-    };
-  }
-
-  const fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
-    const response = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=500&format=json&origin=*`
-    );
-
-    const data: WikiApiResponse = await response.json();
-    return data.query.geosearch;
-  };
-
   // The UI stuff
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing='back' />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={getLocation}>
+        <TouchableOpacity style={styles.button} onPress={searchLocation}>
           <Text style={styles.text}>Button</Text>
         </TouchableOpacity>
       </View>
