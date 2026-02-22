@@ -1,26 +1,38 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
 
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState } from 'react';
+import * as Location from 'expo-location';
 
 export default function App() {
   // The Constants
-  const [permission, requestPermission] = useCameraPermissions();
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [locationStatus, requestLocationPermission] = Location.useForegroundPermissions();
 
-  // The Functions
-  if (!permission) {
+  // The defined Functions 
+  // Get location from device and return it as [lat, lon]
+  let getLocation = function() {
+    let location = Location.getCurrentPositionAsync({});
+    return [location.coords.latitude, location.coords.longitude];
+  }
+
+  // The functions
+  if (!cameraPermission || !locationStatus) {
     // Camera permissions are still loading.
     return <View />;
   }
 
-  if (!permission.granted) {
+  // Check camera Permissions
+  if (!cameraPermission.granted) {
     // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to use the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+    requestCameraPermission();
+  }
+
+  // Check location permissions
+  let {locationPermission} = Location.requestForegroundPermissionsAsync();
+  if (locationPermission != 'granted') {
+    // Location permissions are not granted yet.
+    requestLocationPermission();
   }
 
   // The UI stuff
@@ -28,7 +40,7 @@ export default function App() {
     <View style={styles.container}>
       <CameraView style={styles.camera} facing='back' />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} /* onPress={ Code here } */>
+        <TouchableOpacity style={styles.button} onPress={getLocation}>
           <Text style={styles.text}>Button</Text>
         </TouchableOpacity>
       </View>
