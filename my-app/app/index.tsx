@@ -18,6 +18,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
   const { distance, gemini, tts } = useSettings();
+  const [isSearchHidden, setIsSearchHidden] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -33,7 +34,6 @@ export default function App() {
   const [manualResult, setManualResult] = useState<PlaceDetail | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
-<<<<<<< HEAD
   // Initialize magnetometer to get compass heading
   /*useEffect(() => {
     Magnetometer.setUpdateInterval(500);
@@ -61,14 +61,14 @@ export default function App() {
   }, [locationStatus]); */
 
   // Helper function: Calculate bearing from point A to point B
-  const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  /*const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const dLon = lon2 - lon1;
     const y = Math.sin(dLon * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
     const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
               Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon * Math.PI / 180);
     const bearing = Math.atan2(y, x) * (180 / Math.PI);
     return (bearing + 360) % 360;
-  };
+  }; 
 
   // Helper function: Calculate angular distance between two angles (shortest path)
   const getAngularDistance = (angle1: number, angle2: number): number => {
@@ -95,7 +95,7 @@ export default function App() {
 
     // Return the closest result in the direction user is facing
     return resultsWithBearing[0];
-  };
+  }; */
 
   // Get location from device
   /*const getLocation = async () => {
@@ -111,7 +111,7 @@ export default function App() {
     } };*/
 
   // Fetch places from Wikipedia geosearch API
-  const fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
+  /* const fetchWikiPlaces = async (lat: number, lon: number): Promise<GeoSearchResult[]> => {
     try {
       let headers = new Headers({
         "Accept"       : "application/json",
@@ -130,7 +130,7 @@ export default function App() {
       console.error('Error fetching wiki places: ', error);
       return [];
     }
-  };
+  }; */
 
   // Main search function: Get location, heading, and find closest place in direction
   const searchLocation = async () => {
@@ -150,19 +150,22 @@ export default function App() {
       if (best) {
         const detail = await fetchPlaceDetail(best);
         setManualResult(detail);
+        setIsSearchHidden(true)
       } else {
         setManualResult(null);
+        setIsSearchHidden(false)
+
       }
 
 
+/*
       const places = await fetchWikiPlaces(location.lat, location.lon);
       const closestInDirection = filterResultsByDirection(places, location.lat, location.lon, heading);
-      setSearchResults(closestInDirection);
-      setShowModal(true);
+      setShowModal(true); */
     } catch (error) {
       console.error('Search error:', error);
     } finally {
-      setIsSearching(false);
+      setIsSearching(false); 
     }
   };
 
@@ -232,8 +235,7 @@ export default function App() {
 
       {/* ── Manual mode ── */}
       {!autoDetect && manualResult && <PlaceInfoCard place={manualResult} />}
-      {!autoDetect && (
-        <View style={styles.buttonContainer}>
+      {!autoDetect && !isSearchHidden && <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, isSearching && styles.buttonDisabled]}
             onPress={searchLocation}
@@ -244,7 +246,7 @@ export default function App() {
             </Text>
           </TouchableOpacity>
         </View>
-      )}
+      }
 
 
       {/*  Monument Popup 
