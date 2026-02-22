@@ -236,8 +236,8 @@ export default function App() {
       )}
 
       {/* ── Manual mode ── */}
-      {!autoDetect && manualResult && <PlaceInfoCard place={manualResult} />}
-      {!autoDetect && !isSearchHidden && <View style={styles.buttonContainer}>
+      {!autoDetect && manualResult && isSearchHidden && <PlaceInfoCard place={manualResult} />}
+      {!autoDetect  && <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, isSearching && styles.buttonDisabled]}
             onPress={searchLocation}
@@ -251,6 +251,13 @@ export default function App() {
         </View>
       }
 
+      {/* Close button 
+      {isSearchHidden && <View style={styles.buttoncontainer}>
+          <TouchableOpacity style={styles.button} onPress={console.log('Something went wr2ong')}>
+              <Text style={styles.buttontext}>Close</Text>
+          </TouchableOpacity>
+        </View>} */}
+    
 
       {/*  Monument Popup 
       { showModal && (

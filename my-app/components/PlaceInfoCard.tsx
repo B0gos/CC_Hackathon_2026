@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { PlaceDetail } from '../types';
   interface Props {
     place: PlaceDetail;
@@ -6,7 +6,6 @@ import { PlaceDetail } from '../types';
   export function PlaceInfoCard({ place }: Props) {
     return (
       <View style={styles.card}>
-        <View style={styles.handle} />
         <View style={styles.header}>
           {place.thumbnail && (
             <Image source={{ uri: place.thumbnail }} style={styles.thumbnail} />
@@ -19,6 +18,8 @@ import { PlaceDetail } from '../types';
         <ScrollView style={styles.body}>
           <Text style={styles.extract}>{place.extract}</Text>
         </ScrollView>
+        
+        <View style={styles.long}></View>
       </View>
     );
   }
@@ -33,11 +34,11 @@ import { PlaceDetail } from '../types';
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       paddingHorizontal: 20,
-      paddingBottom: 32,
-      maxHeight: '40%',
+      paddingVertical: 32,
+      maxHeight: '60%',
     },
     // The little handle at the top of the card to indicate it can be swiped up/down
-    handle: {
+   /* handle: {
       width: 40,
       height: 4,
       borderRadius: 2,
@@ -45,7 +46,7 @@ import { PlaceDetail } from '../types';
       alignSelf: 'center',
       marginTop: 10,
       marginBottom: 12,
-    },
+    }, */ 
     header: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -73,7 +74,8 @@ import { PlaceDetail } from '../types';
     },
     body: {
       maxHeight: 120, // Since I don't want the card to never covers more than 40% of the screen, so the camera is always visible above it.
-    },
+      marginBottom: 128  
+  },
     extract: {
       color: '#cccccc',
       fontSize: 14,
